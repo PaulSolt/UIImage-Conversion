@@ -180,7 +180,7 @@
 		
 		image = [UIImage imageWithCGImage:imageRef];
 		
-// Support both iPad 3.2 and iPhone 4 Retina displays with the correct scale
+		// Support both iPad 3.2 and iPhone 4 Retina displays with the correct scale
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 30200
 		image = [UIImage imageWithCGImage:imageRef];
 #else
