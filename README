@@ -4,12 +4,13 @@ Paul Solt 2010
 
 Here's a sample project and code to convert between UIImage objects and RGBA8 bitmaps. The sample project is iPhone 4/iPad 3.2 compatible. 
 
-It works with the Retina display on working with high resolution images.
+The ImageHelper works with iPhone 4 and the Retina display using the correct scale factor with high resolution images.
 
 
-Basic Example Usage: 
+Basic Example Usage showing the ability to convert back and forth between formats: 
+---------------------------------------------------------------------------------
 
-// Assumes that Icon4.png exists in the project folder and has been added to the project
+// Look at the sample project for actual usage
 
 	NSString *path = (NSString*)[[NSBundle mainBundle] pathForResource:@"Icon4" ofType:@"png"];
 	UIImage *image = [UIImage imageWithContentsOfFile:path]; 
