@@ -11,11 +11,7 @@
 
 @implementation ImageHelper
 
-/** Creates a unsigned char bitmap RGBA8 using an UIImage. 
- 
- @param image - the UIImage to get the bitmap data from
- @return a buffer in the format RGBA8 with 32bit color. Cleanup with free() when finished using.
- */
+
 + (unsigned char *) convertUIImageToBitmapRGBA8:(UIImage *) image {
 	
 	CGImageRef imageRef = image.CGImage;
@@ -131,7 +127,7 @@
 		return NULL;
 	}
 	
-	CGBitmapInfo bitmapInfo = kCGBitmapByteOrderDefault; //kCGBitmapAlphaInfoMask; //
+	CGBitmapInfo bitmapInfo = kCGBitmapByteOrderDefault; 
 	CGColorRenderingIntent renderingIntent = kCGRenderingIntentDefault;
 	
 	CGImageRef iref = CGImageCreate(width, 
