@@ -125,7 +125,7 @@
 	CGColorSpaceRef colorSpaceRef = CGColorSpaceCreateDeviceRGB();
 	if(colorSpaceRef == NULL) {
 		NSLog(@"Error allocating color space");
-		return NULL;
+		return nil;
 	}
 	
 	CGBitmapInfo bitmapInfo = kCGBitmapByteOrderDefault; 
@@ -142,14 +142,14 @@
 									NULL,		// decode
 									YES,			// should interpolate
 									renderingIntent);
-	
-	
+		
 	uint32_t* pixels = (uint32_t*)malloc(bufferLength);
 	
 	if(pixels == NULL) {
 		NSLog(@"Error: Memory not allocated for bitmap");
 		CGColorSpaceRelease(colorSpaceRef);
-		return NULL;
+		CGImageRelease(iref);		
+		return nil;
 	}
 	
 	CGContextRef context = CGBitmapContextCreate(pixels, 
@@ -161,12 +161,11 @@
 												 kCGImageAlphaPremultipliedLast); 
 	
 	if(context == NULL) {
-		free(pixels);
 		NSLog(@"Error context not created");
+		free(pixels);
 	}
 	
 	UIImage *image = nil;
-	
 	if(context) {
 		
 		CGContextDrawImage(context, CGRectMake(0.0f, 0.0f, width, height), iref);
@@ -184,11 +183,11 @@
 		}
 		
 		CGImageRelease(imageRef);	
-		CGImageRelease(iref);
-		CGContextRelease(context);			
+		CGContextRelease(context);	
 	}
 	
 	CGColorSpaceRelease(colorSpaceRef);
+	CGImageRelease(iref);
 	CGDataProviderRelease(provider);
 	
 	if(pixels) {
