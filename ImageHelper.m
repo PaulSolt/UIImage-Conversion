@@ -84,6 +84,7 @@
 	
 	// Allocate memory for image data
 	bitmapData = (uint32_t *)malloc(bufferLength);
+	
 	if(!bitmapData) {
 		NSLog(@"Error allocating memory for bitmap\n");
 		CGColorSpaceRelease(colorSpace);
@@ -123,7 +124,7 @@
 	
 	CGColorSpaceRef colorSpaceRef = CGColorSpaceCreateDeviceRGB();
 	if(colorSpaceRef == NULL) {
-		fprintf(stderr, "Error allocating color space\n");
+		NSLog(@"Error allocating color space");
 		return NULL;
 	}
 	
@@ -146,8 +147,7 @@
 	uint32_t* pixels = (uint32_t*)malloc(bufferLength);
 	
 	if(pixels == NULL) {
-		fprintf(stderr, "Memory not allocated for bitmap");
-		NSLog(@"ERROR alloc");
+		NSLog(@"Error: Memory not allocated for bitmap");
 		CGColorSpaceRelease(colorSpaceRef);
 		return NULL;
 	}
@@ -162,11 +162,10 @@
 	
 	if(context == NULL) {
 		free(pixels);
-		fprintf(stderr, "Context not created!");
 		NSLog(@"Error context not created");
 	}
 	
-	UIImage *image = NULL;
+	UIImage *image = nil;
 	
 	if(context) {
 		
@@ -177,12 +176,12 @@
 		image = [UIImage imageWithCGImage:imageRef];
 		
 		// Support both iPad 3.2 and iPhone 4 Retina displays with the correct scale
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 30200
-		image = [UIImage imageWithCGImage:imageRef];
-#else
-		float scale = [[UIScreen mainScreen] scale];
-		image = [UIImage imageWithCGImage:imageRef scale:scale orientation:UIImageOrientationUp];
-#endif
+		if([UIImage respondsToSelector:@selector(imageWithCGImage:scale:orientation:)]) {
+			float scale = [[UIScreen mainScreen] scale];
+			image = [UIImage imageWithCGImage:imageRef scale:scale orientation:UIImageOrientationUp];
+		} else {
+			image = [UIImage imageWithCGImage:imageRef];
+		}
 		
 		CGImageRelease(imageRef);	
 		CGImageRelease(iref);
