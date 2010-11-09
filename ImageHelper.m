@@ -172,8 +172,6 @@
 		
 		CGImageRef imageRef = CGBitmapContextCreateImage(context);
 		
-		image = [UIImage imageWithCGImage:imageRef];
-		
 		// Support both iPad 3.2 and iPhone 4 Retina displays with the correct scale
 		if([UIImage respondsToSelector:@selector(imageWithCGImage:scale:orientation:)]) {
 			float scale = [[UIScreen mainScreen] scale];
