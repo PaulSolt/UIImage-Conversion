@@ -17,7 +17,7 @@
 	CGImageRef imageRef = image.CGImage;
 	
 	// Create a bitmap context to draw the uiimage into
-	CGContextRef context = [self createBitmapRGBA8ContextFromImage:imageRef];
+	CGContextRef context = [self newBitmapRGBA8ContextFromImage:imageRef];
 	
 	if(!context) {
 		return NULL;
@@ -60,7 +60,7 @@
 	return newBitmap;	
 }
 
-+ (CGContextRef) createBitmapRGBA8ContextFromImage:(CGImageRef) image {
++ (CGContextRef) newBitmapRGBA8ContextFromImage:(CGImageRef) image {
 	CGContextRef context = NULL;
 	CGColorSpaceRef colorSpace;
 	uint32_t *bitmapData;
@@ -125,6 +125,7 @@
 	CGColorSpaceRef colorSpaceRef = CGColorSpaceCreateDeviceRGB();
 	if(colorSpaceRef == NULL) {
 		NSLog(@"Error allocating color space");
+		CGDataProviderRelease(provider);
 		return nil;
 	}
 	
@@ -147,6 +148,7 @@
 	
 	if(pixels == NULL) {
 		NSLog(@"Error: Memory not allocated for bitmap");
+		CGDataProviderRelease(provider);
 		CGColorSpaceRelease(colorSpaceRef);
 		CGImageRelease(iref);		
 		return nil;

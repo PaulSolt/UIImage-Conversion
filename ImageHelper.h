@@ -19,8 +19,10 @@
  */
 + (unsigned char *) convertUIImageToBitmapRGBA8:(UIImage *)image;
 
-/** A helper routine used to convert a RGBA8 to UIImage */
-+ (CGContextRef) createBitmapRGBA8ContextFromImage:(CGImageRef)image;
+/** A helper routine used to convert a RGBA8 to UIImage
+ @return a new context that is owned by the caller
+ */
++ (CGContextRef) newBitmapRGBA8ContextFromImage:(CGImageRef)image;
 
 
 /** Converts a RGBA8 bitmap to a UIImage. 
