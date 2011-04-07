@@ -20,9 +20,8 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {    
     
     // Override point for customization after application launch.
-    
-	NSString *path = (NSString*)[[NSBundle mainBundle] pathForResource:@"Icon4" ofType:@"png"];
-	UIImage *image = [UIImage imageWithContentsOfFile:path]; 
+
+      UIImage *image = [UIImage imageNamed:@"Icon4.png"];
 	int width = image.size.width;
 	int height = image.size.height;
 	
@@ -32,18 +31,20 @@
 	// Create a UIImage using the bitmap
 	UIImage *imageCopy = [ImageHelper convertBitmapRGBA8ToUIImage:bitmap withWidth:width withHeight:height];
 	
+	// Cleanup
+	if(bitmap) {
+		free(bitmap);	
+		bitmap = NULL;
+	}
+	
 	// Display the image copy on the GUI
 	UIImageView *imageView = [[UIImageView alloc] initWithImage:imageCopy];
-
 	CGPoint center = CGPointMake([UIScreen mainScreen].bounds.size.width / 2.0, 
 								 [UIScreen mainScreen].bounds.size.height / 2.0);
 	[imageView setCenter:center];
-	
 	[window addSubview:imageView];
 	[imageView release];
 
-	// Cleanup
-	free(bitmap);	
 	
     [window makeKeyAndVisible];
     

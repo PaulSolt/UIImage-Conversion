@@ -15,6 +15,7 @@
 		2860E32E111B888700E27156 /* AppDelegate_iPad.m in Sources */ = {isa = PBXBuildFile; fileRef = 2860E32C111B888700E27156 /* AppDelegate_iPad.m */; };
 		2860E32F111B888700E27156 /* MainWindow_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2860E32D111B888700E27156 /* MainWindow_iPad.xib */; };
 		288765FD0DF74451002DB57D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288765FC0DF74451002DB57D /* CoreGraphics.framework */; };
+		BD12AFAF134E31C40052742A /* MITLicense.txt in Resources */ = {isa = PBXBuildFile; fileRef = BD12AFAE134E31C40052742A /* MITLicense.txt */; };
 		BD3F462C124A7A5D00959DE5 /* ImageHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = BD3F462B124A7A5D00959DE5 /* ImageHelper.m */; };
 		BD3F4650124A852600959DE5 /* Icon4.png in Resources */ = {isa = PBXBuildFile; fileRef = BD3F464F124A852600959DE5 /* Icon4.png */; };
 /* End PBXBuildFile section */
@@ -33,6 +34,7 @@
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = Shared/main.m; sourceTree = "<group>"; };
 		32CA4F630368D1EE00C91783 /* ImageConversion_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageConversion_Prefix.pch; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* ImageConversion-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "ImageConversion-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
+		BD12AFAE134E31C40052742A /* MITLicense.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = MITLicense.txt; sourceTree = "<group>"; };
 		BD3F462A124A7A5D00959DE5 /* ImageHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageHelper.h; sourceTree = "<group>"; };
 		BD3F462B124A7A5D00959DE5 /* ImageHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageHelper.m; sourceTree = "<group>"; };
 		BD3F464F124A852600959DE5 /* Icon4.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon4.png; sourceTree = "<group>"; };
@@ -94,6 +96,7 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
+				BD12AFAE134E31C40052742A /* MITLicense.txt */,
 				2860E32A111B888700E27156 /* iPad */,
 				2860E324111B887F00E27156 /* iPhone */,
 				28EEBF621118D79A00187D67 /* Shared */,
@@ -178,6 +181,7 @@
 				2860E329111B887F00E27156 /* MainWindow_iPhone.xib in Resources */,
 				2860E32F111B888700E27156 /* MainWindow_iPad.xib in Resources */,
 				BD3F4650124A852600959DE5 /* Icon4.png in Resources */,
+				BD12AFAF134E31C40052742A /* MITLicense.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -207,7 +211,9 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = ImageConversion_Prefix.pch;
+				GCC_VERSION = 4.2;
 				INFOPLIST_FILE = "ImageConversion-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 3.2;
 				PRODUCT_NAME = ImageConversion;
 			};
 			name = Debug;
@@ -219,7 +225,9 @@
 				COPY_PHASE_STRIP = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = ImageConversion_Prefix.pch;
+				GCC_VERSION = 4.2;
 				INFOPLIST_FILE = "ImageConversion-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 3.2;
 				PRODUCT_NAME = ImageConversion;
 				VALIDATE_PRODUCT = YES;
 			};
