@@ -109,14 +109,13 @@
 	}
 	
 	//Create bitmap context
-	
 	context = CGBitmapContextCreate(bitmapData, 
 									width, 
 									height, 
 									bitsPerComponent, 
 									bytesPerRow, 
 									colorSpace, 
-									kCGImageAlphaPremultipliedLast);	// RGBA
+                                    kCGImageAlphaPremultipliedLast);	// RGBA
 	
 	if(!context) {
 		free(bitmapData);
@@ -145,8 +144,7 @@
 		CGDataProviderRelease(provider);
 		return nil;
 	}
-	
-	CGBitmapInfo bitmapInfo = kCGBitmapByteOrderDefault;
+	CGBitmapInfo bitmapInfo = kCGBitmapByteOrderDefault | kCGImageAlphaPremultipliedLast;
 	CGColorRenderingIntent renderingIntent = kCGRenderingIntentDefault;
 	
 	CGImageRef iref = CGImageCreate(width, 
@@ -177,7 +175,7 @@
 												 bitsPerComponent, 
 												 bytesPerRow, 
 												 colorSpaceRef,
-												 kCGImageAlphaPremultipliedLast); 
+                                                 bitmapInfo);
 	
 	if(context == NULL) {
 		NSLog(@"Error context not created");

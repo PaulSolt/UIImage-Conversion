@@ -14,5 +14,9 @@
 
 @property (nonatomic, retain) IBOutlet UIWindow *window;
 
+
+// Adds an image to an imageview on the window
+- (void)addImage:(NSString *)theFilename atPosition:(CGPoint)thePosition;
+
 @end
 
