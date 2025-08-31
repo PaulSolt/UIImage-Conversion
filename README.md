@@ -15,8 +15,7 @@ I had to be more explicit to return to the previous behavior, since the new defa
 
 My rendering of genetic algorithms using this logic broke when I compiled for the first time on Apple Silicon. I use this in [Artwork Evolution](https://www.artworkevolution.com/artwork-evolution-1)
 
-![IMG_F2593A24FA6B-1](https://github.com/user-attachments/assets/1c7a5851-703f-485a-aec2-56815b611b3b)
-
+<img src="[images/NumberGuessingGame.png](https://github.com/user-attachments/assets/1c7a5851-703f-485a-aec2-56815b611b3b)" alt="" style="width: 250px;"/>
 
 
 Basic Example Usage showing the ability to convert back and forth between formats: 
