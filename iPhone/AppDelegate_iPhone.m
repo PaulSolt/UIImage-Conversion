@@ -49,43 +49,12 @@
         host = scroll; // add all demo views into the scroll view
         [scroll release];
 
-        CGImageRef cg = src.CGImage;
-        size_t w = CGImageGetWidth(cg);
-        size_t h = CGImageGetHeight(cg);
-        size_t len = w * h * 4;
-
-        unsigned char *b1 = [ImageHelper convertUIImageToBitmapRGBA8:src];
-        UIImage *rt = [ImageHelper convertBitmapRGBA8ToUIImage:b1 withWidth:(int)w withHeight:(int)h];
-        unsigned char *b2 = [ImageHelper convertUIImageToBitmapRGBA8:rt];
-
-        // Compute abs-channel diff image and count
-        NSUInteger diffs = 0;
-        unsigned char *dbuf = (unsigned char *)malloc(len);
-        if (dbuf && b1 && b2) {
-            for (size_t j = 0; j < len; j += 4) {
-                int dr = (int)b2[j+0] - (int)b1[j+0];
-                int dg = (int)b2[j+1] - (int)b1[j+1];
-                int db = (int)b2[j+2] - (int)b1[j+2];
-                int da = (int)b2[j+3] - (int)b1[j+3];
-                if (dr|dg|db|da) { diffs++; }
-                dbuf[j+0] = (unsigned char)abs(dr);
-                dbuf[j+1] = (unsigned char)abs(dg);
-                dbuf[j+2] = (unsigned char)abs(db);
-                dbuf[j+3] = 255;
-            }
-        }
-        UIImage *diffImg = dbuf ? [ImageHelper convertBitmapRGBA8ToUIImage:dbuf withWidth:(int)w withHeight:(int)h] : nil;
-        if (dbuf) { free(dbuf); }
-
-        if (b1) { free(b1); }
-        if (b2) { free(b2); }
+        // No precompute; triads below handle their own round-trip/diff
 
         // Layout: stack vertically with labels
         CGFloat margin = 16.0f;
         __block CGFloat y = 80.0f; // allow mutation within blocks
         CGFloat maxWidth = host.bounds.size.width - 2 * margin;
-        CGFloat scale = MIN(1.0f, maxWidth / src.size.width);
-        CGSize disp = CGSizeMake(src.size.width * scale, src.size.height * scale);
 
         UILabel *(^makeLabelAtY)(NSString *) = ^UILabel*(NSString *text){
             UILabel *l = [[UILabel alloc] initWithFrame:CGRectMake(margin, y, host.bounds.size.width - 2*margin, 18.0f)];
@@ -158,7 +127,7 @@
             lab = makeLabelAtY(t);
             [host addSubview:lab];
             y += 20.0f;
-            if (dimg) {
+            if (dimg && dc > 0) {
                 iv = makeImageViewAtY(dimg, size);
                 iv.frame = CGRectMake((host.bounds.size.width - size.width)/2.0f, y, size.width, size.height);
                 [host addSubview:iv];

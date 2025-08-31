@@ -9,6 +9,8 @@
 #import "AppDelegate_iPad.h"
 #import "ImageHelper.h"
 #import "GraphicsCommon.h"
+#import <QuartzCore/QuartzCore.h>
+#include <cstdlib>
 
 @implementation AppDelegate_iPad
 
@@ -138,7 +140,7 @@
     }
     [label release];
 
-    if (diffImage) {
+    if (diffImage && diffs > 0) {
         UIImageView *diffView = [[UIImageView alloc] initWithImage:diffImage];
         CGPoint p = thePosition;
         p.y += imageView.bounds.size.height/2.0f + 14.0f + 12.0f + diffView.bounds.size.height/2.0f;
