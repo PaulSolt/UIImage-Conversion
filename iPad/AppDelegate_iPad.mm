@@ -21,31 +21,39 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {    
     
     // Override point for customization after application launch.
+    // Ensure window has a root view controller (required on iOS 5+).
+    // Wrap in respondsToSelector for legacy SDK compatibility.
+    if ([self.window respondsToSelector:@selector(setRootViewController:)]) {
+        UIViewController *rootViewController = [[UIViewController alloc] init];
+        self.window.rootViewController = rootViewController;
+        [rootViewController release];
+    }
 //
-//    UIImage *image = [UIImage imageNamed:@"Icon4.png"];
-//	int width = image.size.width;
-//	int height = image.size.height;
-//	
-//	// Create a bitmap
-//	unsigned char *bitmap = [ImageHelper convertUIImageToBitmapRGBA8:image];
-//	
-//	// Create a UIImage using the bitmap
-//	UIImage *imageCopy = [ImageHelper convertBitmapRGBA8ToUIImage:bitmap withWidth:width withHeight:height];
-//	
-//	// Cleanup
-//	if(bitmap) {
-//		free(bitmap);	
-//		bitmap = NULL;
-//	}
-//	
-//	// Display the image copy on the GUI
-//	UIImageView *imageView = [[UIImageView alloc] initWithImage:imageCopy];
-//	CGPoint center = CGPointMake([UIScreen mainScreen].bounds.size.width / 2.0, 
-//								 [UIScreen mainScreen].bounds.size.height / 2.0);
-//	[imageView setCenter:center];
-//	[window addSubview:imageView];
-//	[imageView release];
-    CGPoint iconPosition = CGPointMake([UIScreen mainScreen].bounds.size.width / 2.0, 
+    UIImage *image = [UIImage imageNamed:@"Icon4.png"];
+	int width = image.size.width;
+	int height = image.size.height;
+	
+	// Create a bitmap
+	unsigned char *bitmap = [ImageHelper convertUIImageToBitmapRGBA8:image];
+	
+	// Create a UIImage using the bitmap
+	UIImage *imageCopy = [ImageHelper convertBitmapRGBA8ToUIImage:bitmap withWidth:width withHeight:height];
+	
+	// Cleanup
+	if(bitmap) {
+		free(bitmap);	
+		bitmap = NULL;
+	}
+	
+	// Display the image copy on the GUI
+	UIImageView *imageView = [[UIImageView alloc] initWithImage:imageCopy];
+	CGPoint center = CGPointMake([UIScreen mainScreen].bounds.size.width / 2.0, 
+								 [UIScreen mainScreen].bounds.size.height / 2.0);
+	[imageView setCenter:center];
+	[window addSubview:imageView];
+	[imageView release];
+    
+    CGPoint iconPosition = CGPointMake([UIScreen mainScreen].bounds.size.width / 2.0,
                                         [UIScreen mainScreen].bounds.size.height / 2.0);
     [self addImage:@"Icon4.png" atPosition:iconPosition];
     
@@ -75,18 +83,78 @@
 	
 	// Create a UIImage using the bitmap
 	UIImage *imageCopy = [ImageHelper convertBitmapRGBA8ToUIImage:bitmap withWidth:width withHeight:height];
+
+    // Round-trip back to bytes and compute per-pixel differences
+    unsigned char *bitmap2 = [ImageHelper convertUIImageToBitmapRGBA8:imageCopy];
+    size_t len = (size_t)width * (size_t)height * 4;
+    NSUInteger diffs = 0;
+    unsigned char *diffBuf = (unsigned char *)malloc(len);
+    if (diffBuf && bitmap && bitmap2) {
+        for (size_t j = 0; j < len; j += 4) {
+            int dr = (int)bitmap2[j+0] - (int)bitmap[j+0];
+            int dg = (int)bitmap2[j+1] - (int)bitmap[j+1];
+            int db = (int)bitmap2[j+2] - (int)bitmap[j+2];
+            int da = (int)bitmap2[j+3] - (int)bitmap[j+3];
+            if (dr|dg|db|da) { diffs++; }
+            diffBuf[j+0] = (unsigned char)abs(dr);
+            diffBuf[j+1] = (unsigned char)abs(dg);
+            diffBuf[j+2] = (unsigned char)abs(db);
+            diffBuf[j+3] = 255;
+        }
+    }
+    UIImage *diffImage = nil;
+    if (diffBuf) {
+        diffImage = [ImageHelper convertBitmapRGBA8ToUIImage:diffBuf withWidth:width withHeight:height];
+    }
+    if (diffBuf) { free(diffBuf); }
+    if (colorOut) { delete [] colorOut; }
+    if (bitmap2) { free(bitmap2); }
+    if(bitmap) {
+        free(bitmap);
+        bitmap = NULL;
+    }
 	
-	// Cleanup
-	if(bitmap) {
-		free(bitmap);	
-		bitmap = NULL;
-	}
-	
-	// Display the image copy on the GUI
+    // Display the image copy on the GUI
 	UIImageView *imageView = [[UIImageView alloc] initWithImage:imageCopy];
 	[imageView setCenter:thePosition];
-	[window addSubview:imageView];
-	[imageView release];
+	if ([self.window respondsToSelector:@selector(rootViewController)] && self.window.rootViewController) {
+		[self.window.rootViewController.view addSubview:imageView];
+	} else {
+		[window addSubview:imageView];
+	}
+
+    // Show a compact diff label and optional diff image below
+    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 320, 24)];
+    label.backgroundColor = [UIColor clearColor];
+    label.textAlignment = NSTextAlignmentCenter;
+    label.font = [UIFont systemFontOfSize:14.0f];
+    label.textColor = [UIColor darkGrayColor];
+    label.center = CGPointMake(thePosition.x, thePosition.y + imageView.bounds.size.height/2.0f + 14.0f);
+    label.text = [NSString stringWithFormat:@"Diff count: %lu", (unsigned long)diffs];
+    if ([self.window respondsToSelector:@selector(rootViewController)] && self.window.rootViewController) {
+        [self.window.rootViewController.view addSubview:label];
+    } else {
+        [window addSubview:label];
+    }
+    [label release];
+
+    if (diffImage) {
+        UIImageView *diffView = [[UIImageView alloc] initWithImage:diffImage];
+        CGPoint p = thePosition;
+        p.y += imageView.bounds.size.height/2.0f + 14.0f + 12.0f + diffView.bounds.size.height/2.0f;
+        diffView.center = p;
+        // Add a thin border to distinguish
+        diffView.layer.borderColor = [UIColor lightGrayColor].CGColor;
+        diffView.layer.borderWidth = 1.0f;
+        if ([self.window respondsToSelector:@selector(rootViewController)] && self.window.rootViewController) {
+            [self.window.rootViewController.view addSubview:diffView];
+        } else {
+            [window addSubview:diffView];
+        }
+        [diffView release];
+    }
+
+    [imageView release];
 }
 
 

@@ -1,27 +1,10 @@
-/*
- * The MIT License
- *
- * Copyright (c) 2011 Paul Solt, PaulSolt@gmail.com
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *
- */
+//
+//  ImageHelper.m
+//  ImageConversion
+//
+//  Created by Paul Solt on 9/22/10.
+//  Copyright 2010 Paul Solt. All rights reserved.
+//
 
 #import "ImageHelper.h"
 
@@ -66,13 +49,14 @@
 			}
 		}
 		
-		free(bitmapData);
-		
 	} else {
 		NSLog(@"Error getting bitmap pixel data\n");
 	}
 	
 	CGContextRelease(context);
+	if(bitmapData) {
+		free(bitmapData);
+	}
 	
 	return newBitmap;	
 }
@@ -109,13 +93,14 @@
 	}
 	
 	//Create bitmap context
+	
 	context = CGBitmapContextCreate(bitmapData, 
 									width, 
 									height, 
 									bitsPerComponent, 
 									bytesPerRow, 
 									colorSpace, 
-                                    kCGImageAlphaPremultipliedLast);	// RGBA
+									kCGBitmapByteOrder32Big | kCGImageAlphaPremultipliedLast);	// RGBA
 	
 	if(!context) {
 		free(bitmapData);
@@ -144,7 +129,8 @@
 		CGDataProviderRelease(provider);
 		return nil;
 	}
-	CGBitmapInfo bitmapInfo = kCGBitmapByteOrderDefault | kCGImageAlphaPremultipliedLast;
+	
+	CGBitmapInfo bitmapInfo = kCGBitmapByteOrder32Big | kCGImageAlphaPremultipliedLast; 
 	CGColorRenderingIntent renderingIntent = kCGRenderingIntentDefault;
 	
 	CGImageRef iref = CGImageCreate(width, 
@@ -174,8 +160,8 @@
 												 height, 
 												 bitsPerComponent, 
 												 bytesPerRow, 
-												 colorSpaceRef,
-                                                 bitmapInfo);
+												 colorSpaceRef, 
+												 kCGBitmapByteOrder32Big | kCGImageAlphaPremultipliedLast); 
 	
 	if(context == NULL) {
 		NSLog(@"Error context not created");
@@ -209,6 +195,158 @@
 		free(pixels);
 	}	
 	return image;
+}
+
+
+
++ (UIImage *) compositeImage:(UIImage *)topImage onImage:(UIImage *)bottomImage withInset:(CGSize)theInset{
+
+	CGFloat scale = 1.0;
+	if([[UIScreen mainScreen] respondsToSelector:@selector(scale)]) {
+		scale = [[UIScreen mainScreen] scale];
+	}
+	
+	NSUInteger width = bottomImage.size.width * scale; // + 20;
+	NSUInteger height = bottomImage.size.height * scale; // + 20;
+	
+	//size_t bufferLength = width * height * 4;
+	size_t bitsPerComponent = 8;
+	//size_t bitsPerPixel = 32;
+	size_t bytesPerRow = 4 * width;
+	
+	CGColorSpaceRef colorSpaceRef = CGColorSpaceCreateDeviceRGB();
+		
+	CGContextRef context = CGBitmapContextCreate(NULL, 
+												 width, 
+												 height, 
+												 bitsPerComponent, 
+												 bytesPerRow, 
+												 colorSpaceRef, 
+												 kCGImageAlphaPremultipliedLast); 
+	
+	
+	
+	UIImage *image = nil;
+	if(context) {
+		
+//		CGContextDrawImage(context, CGRectMake(15.0f, 15.0f, width - 30, height - 30), bottomImage.CGImage);
+		CGContextDrawImage(context, CGRectMake(theInset.width * scale, theInset.height * scale, width - (scale * 2 * theInset.width), 
+											   height - (scale * 2 * theInset.height)), bottomImage.CGImage);
+		
+		CGContextDrawImage(context, CGRectMake(0.0f, 0.0f, width, height), topImage.CGImage);
+		
+		CGImageRef imageRef = CGBitmapContextCreateImage(context);
+		
+		// Support both iPad 3.2 and iPhone 4 Retina displays with the correct scale
+		if([UIImage respondsToSelector:@selector(imageWithCGImage:scale:orientation:)]) {
+			float scale = [[UIScreen mainScreen] scale];
+			image = [UIImage imageWithCGImage:imageRef scale:scale orientation:UIImageOrientationUp];
+		//	ALog(@"RETINA");
+		} else {
+		//	ALog(@"NOT RETINA");
+			image = [UIImage imageWithCGImage:imageRef];
+		}
+		
+		
+		
+		CGImageRelease(imageRef);	
+		CGContextRelease(context);	
+	}
+	
+	CGColorSpaceRelease(colorSpaceRef);
+		
+	return image;
+}
+
+//+ (UIImage *) scaleImage:(UIImage *)theImage toSize:(CGSize)newSize keepAspectRatio:(BOOL)aspectRatio { 
+//	CGFloat scale = 1.0;
+//	if([[UIScreen mainScreen] respondsToSelector:@selector(scale)]) {
+//		scale = [[UIScreen mainScreen] scale];
+//	}
+//    
+//    if(aspectRatio) {
+//        // Use the longer edge and scale respectively
+//        CGFloat maxScaleSize = MAX(newSize.width, newSize.height);
+//        
+//        CGFloat maxImageSize = MAX(theImage.size.width, theImage.size.height);
+//        
+//        
+//        CGFloat scaleFactor = maxImageSize / maxScaleSize;
+//        newSize.width = theImage.size.width / scaleFactor;
+//        newSize.height = theImage.size.height / scaleFactor;
+//    }
+//	
+//	NSUInteger width = newSize.width * scale; //theImage.size.width * scale; // + 20;
+//	NSUInteger height = newSize.height * scale; //theImage.size.height * scale; // + 20;
+//	
+//    ALog(@"Scale: %d x %d", width, height);
+//    
+//	size_t bitsPerComponent = 8;
+//	size_t bytesPerRow = 4 * width;	
+//	CGColorSpaceRef colorSpaceRef = CGColorSpaceCreateDeviceRGB();
+//    
+//	CGContextRef context = CGBitmapContextCreate(NULL, 
+//												 width, 
+//												 height, 
+//												 bitsPerComponent, 
+//												 bytesPerRow, 
+//												 colorSpaceRef, 
+//												 kCGImageAlphaPremultipliedLast); 
+//    UIImage *image = nil;
+//	if(context) {
+//        CGContextDrawImage(context, CGRectMake(0, 0, width, height), theImage.CGImage);
+//		CGImageRef imageRef = CGBitmapContextCreateImage(context);
+//		
+//		// Support both iPad 3.2 and iPhone 4 Retina displays with the correct scale
+//		if([UIImage respondsToSelector:@selector(imageWithCGImage:scale:orientation:)]) {
+//			float scale = [[UIScreen mainScreen] scale];
+//			image = [UIImage imageWithCGImage:imageRef scale:scale orientation:UIImageOrientationUp];
+//            //	ALog(@"RETINA");
+//		} else {
+//            //	ALog(@"NOT RETINA");
+//			image = [UIImage imageWithCGImage:imageRef];
+//		}
+//		CGImageRelease(imageRef);	
+//		CGContextRelease(context);	
+//	}
+//	CGColorSpaceRelease(colorSpaceRef);
+//    return image;
+//}
+
++ (UIImage *)scaleImage:(UIImage*)image toSize:(CGSize)newSize keepAspectRatio:(BOOL)aspectRatio
+{
+       
+    if(aspectRatio) {
+        // Use the longer edge and scale respectively
+        //CGFloat maxScaleSize = MAX(newSize.width, newSize.height);
+        CGFloat minScaleSize = MIN(newSize.width, newSize.height);
+        
+        //CGFloat maxImageSize = MAX(image.size.width, image.size.height);
+        CGFloat minImageSize = MIN(image.size.width, image.size.height);
+        
+        //CGFloat scaleFactor = maxImageSize / maxScaleSize;
+        CGFloat scaleFactor = minImageSize / minScaleSize;
+        
+        newSize.width = image.size.width / scaleFactor;
+        newSize.height = image.size.height / scaleFactor;
+    }
+    
+    // Account for the scale on the UIImage (High resolution screens)
+    CGFloat scale = [[UIScreen mainScreen] scale];
+   
+//    if(scale != 1 && scale != 0) {
+//        newSize.width /= scale;
+//        newSize.height /= scale;
+//    }
+    UIGraphicsBeginImageContextWithOptions(newSize, NO, scale);
+    [image drawInRect:CGRectMake(0,0,newSize.width,newSize.height)];
+    UIImage* newImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+//    UIImage *scaledImage = [UIImage imageWithCGImage:[newImage CGImage] scale:scale orientation:UIImageOrientationUp];
+
+//    return scaledImage;
+    return newImage;
 }
 
 @end
